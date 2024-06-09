@@ -206,3 +206,6 @@ def load_hospital_graph_from_csv() -> None:
         MERGE (h)-[employs:EMPLOYS]->(p)
         """
         _ = session.run(query, {})
+
+if __name__ == "__main__":
+    load_hospital_graph_from_csv()
