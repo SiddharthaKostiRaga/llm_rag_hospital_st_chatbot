@@ -91,7 +91,8 @@ def load_hospital_graph_from_csv() -> None:
     LOGGER.info("Loading visit nodes")
     with driver.session(database="neo4j") as session:
         query = f"""
-        LOAD CSV WITH HEADERS FROM '{VISITS_CSV_PATH}' AS visits
+        LOAD CSV WITH HEADERS 
+        FROM '{VISITS_CSV_PATH}' AS visits
         MERGE (v:Visit {{id: toInteger(visits.visit_id),
                             room_number: toInteger(visits.room_number),
                             admission_type: visits.admission_type,
@@ -135,5 +136,16 @@ def load_hospital_graph_from_csv() -> None:
                          physician_name: reviews.physician_name,
                          hospital_name: reviews.hospital_name
                         }});
+        """
+        _ = session.run(query, {})
+
+    LOGGER.info("Loading 'AT' relationships")
+    with driver.session(database="neo4j") as session:
+        query = f"""
+        LOAD CSV WITH HEADERS FROM '{VISITS_CSV_PATH}' AS row
+        MATCH (source: `Visit` {{ `id`: toInteger(trim(row.`visit_id`)) }})
+        MATCH (target: `Hospital` {{ `id`:
+        toInteger(trim(row.`hospital_id`))}})
+        MERGE (source)-[r: `AT`]->(target)
         """
         _ = session.run(query, {})
