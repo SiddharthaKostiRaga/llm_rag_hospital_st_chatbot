@@ -123,3 +123,17 @@ def load_hospital_graph_from_csv() -> None:
                         }});
         """
         _ = session.run(query, {})
+
+    LOGGER.info("Loading review nodes")
+    with driver.session(database="neo4j") as session:
+        query = f"""
+        LOAD CSV WITH HEADERS
+        FROM '{REVIEWS_CSV_PATH}' AS reviews
+        MERGE (r:Review {{id: toInteger(reviews.review_id),
+                         text: reviews.review,
+                         patient_name: reviews.patient_name,
+                         physician_name: reviews.physician_name,
+                         hospital_name: reviews.hospital_name
+                        }});
+        """
+        _ = session.run(query, {})
