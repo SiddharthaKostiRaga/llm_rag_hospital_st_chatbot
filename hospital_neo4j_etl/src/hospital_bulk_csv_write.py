@@ -142,10 +142,21 @@ def load_hospital_graph_from_csv() -> None:
     LOGGER.info("Loading 'AT' relationships")
     with driver.session(database="neo4j") as session:
         query = f"""
-        LOAD CSV WITH HEADERS FROM '{VISITS_CSV_PATH}' AS row
+        LOAD CSV WITH HEADERS 
+        FROM '{VISITS_CSV_PATH}' AS row
         MATCH (source: `Visit` {{ `id`: toInteger(trim(row.`visit_id`)) }})
-        MATCH (target: `Hospital` {{ `id`:
-        toInteger(trim(row.`hospital_id`))}})
+        MATCH (target: `Hospital` {{ `id`: toInteger(trim(row.`hospital_id`))}})
         MERGE (source)-[r: `AT`]->(target)
+        """
+        _ = session.run(query, {})
+
+    LOGGER.info("Loading 'WRITES' relationships")
+    with driver.session(database="neo4j") as session:
+        query = f"""
+        LOAD CSV WITH HEADERS 
+        FROM '{REVIEWS_CSV_PATH}' AS reviews
+        MATCH (v:Visit {{id: toInteger(reviews.visit_id)}})
+        MATCH (r:Review {{id: toInteger(reviews.review_id)}})
+        MERGE (v)-[writes:WRITES]->(r)
         """
         _ = session.run(query, {})
