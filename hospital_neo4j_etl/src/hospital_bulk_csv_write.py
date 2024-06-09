@@ -195,3 +195,14 @@ def load_hospital_graph_from_csv() -> None:
         MERGE (p)-[has:HAS]->(v)
         """
         _ = session.run(query, {})
+
+    LOGGER.info("Loading 'EMPLOYS' relationships")
+    with driver.session(database="neo4j") as session:
+        query = f"""
+        LOAD CSV WITH HEADERS 
+        FROM '{VISITS_CSV_PATH}' AS visits
+        MATCH (h:Hospital {{id: toInteger(visits.hospital_id)}})
+        MATCH (p:Physician {{id: toInteger(visits.physician_id)}})
+        MERGE (h)-[employs:EMPLOYS]->(p)
+        """
+        _ = session.run(query, {})
