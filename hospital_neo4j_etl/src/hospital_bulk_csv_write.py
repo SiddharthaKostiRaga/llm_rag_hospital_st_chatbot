@@ -87,3 +87,25 @@ def load_hospital_graph_from_csv() -> None:
                             }});
         """
         _ = session.run(query, {})
+
+    LOGGER.info("Loading visit nodes")
+    with driver.session(database="neo4j") as session:
+        query = f"""
+        LOAD CSV WITH HEADERS FROM '{VISITS_CSV_PATH}' AS visits
+        MERGE (v:Visit {{id: toInteger(visits.visit_id),
+                            room_number: toInteger(visits.room_number),
+                            admission_type: visits.admission_type,
+                            admission_date: visits.date_of_admission,
+                            test_results: visits.test_results,
+                            status: visits.visit_status
+        }})
+            ON CREATE SET v.chief_complaint = visits.chief_complaint
+            ON MATCH SET v.chief_complaint = visits.chief_complaint
+            ON CREATE SET v.treatment_description = visits.treatment_description
+            ON MATCH SET v.treatment_description = visits.treatment_description
+            ON CREATE SET v.diagnosis = visits.primary_diagnosis
+            ON MATCH SET v.diagnosis = visits.primary_diagnosis
+            ON CREATE SET v.discharge_date = visits.discharge_date
+            ON MATCH SET v.discharge_date = visits.discharge_date
+         """
+        _ = session.run(query, {})
