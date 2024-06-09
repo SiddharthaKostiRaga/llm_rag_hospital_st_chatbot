@@ -109,3 +109,17 @@ def load_hospital_graph_from_csv() -> None:
             ON MATCH SET v.discharge_date = visits.discharge_date
          """
         _ = session.run(query, {})
+
+    LOGGER.info("Loading patient nodes")
+    with driver.session(database="neo4j") as session:
+        query = f"""
+        LOAD CSV WITH HEADERS
+        FROM '{PATIENTS_CSV_PATH}' AS patients
+        MERGE (p:Patient {{id: toInteger(patients.patient_id),
+                        name: patients.patient_name,
+                        sex: patients.patient_sex,
+                        dob: patients.patient_dob,
+                        blood_type: patients.patient_blood_type
+                        }});
+        """
+        _ = session.run(query, {})
