@@ -50,8 +50,9 @@ def load_hospital_graph_from_csv() -> None:
         A Cypher query to load data from a CSV file specified by HOSPITALS_CSV_PATH.
         LOAD CSV WITH HEADERS: Specifies that the CSV has headers.
         MERGE: Ensures that nodes with the specified properties (id, name, state_name) are created if they don't already exist, 
-        avoiding duplicates."""
-        
+        avoiding duplicates.
+        h:Hospital -> (represent a node in neo4j as Hospital)"""
+
         query = f"""
         LOAD CSV WITH HEADERS
         FROM '{HOSPITALS_CSV_PATH}' AS hospitals
