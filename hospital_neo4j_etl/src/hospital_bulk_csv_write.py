@@ -72,3 +72,18 @@ def load_hospital_graph_from_csv() -> None:
         name: payers.payer_name}});
         """
         _ = session.run(query, {})
+
+    LOGGER.info("Loading physician nodes")
+    with driver.session(database="neo4j") as session:
+        query = f"""
+        LOAD CSV WITH HEADERS
+        FROM '{PHYSICIANS_CSV_PATH}' AS physicians
+        MERGE (p:Physician {{id: toInteger(physicians.physician_id),
+                            name: physicians.physician_name,
+                            dob: physicians.physician_dob,
+                            grad_year: physicians.physician_grad_year,
+                            school: physicians.medical_school,
+                            salary: toFloat(physicians.salary)
+                            }});
+        """
+        _ = session.run(query, {})
