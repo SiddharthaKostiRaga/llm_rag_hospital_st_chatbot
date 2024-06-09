@@ -13,3 +13,10 @@ REVIEWS_CSV_PATH = os.getenv("REVIEWS_CSV_PATH")
 NEO4J_URI = os.getenv("NEO4J_URI")
 NEO4J_USERNAME = os.getenv("NEO4J_USERNAME")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s [%(levelname)s]: %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S",
+                    )
+
+LOGGER = logging.getLogger(__name__)
