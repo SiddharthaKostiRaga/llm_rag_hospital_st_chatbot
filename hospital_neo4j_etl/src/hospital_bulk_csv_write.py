@@ -184,3 +184,14 @@ def load_hospital_graph_from_csv() -> None:
             covered_by.billing_amount = toFloat(visits.billing_amount)
         """
         _ = session.run(query, {})
+
+    LOGGER.info("Loading 'HAS' relationships")
+    with driver.session(database="neo4j") as session:
+        query = f"""
+        LOAD CSV WITH HEADERS 
+        FROM '{VISITS_CSV_PATH}' AS visits
+        MATCH (p:Patient {{id: toInteger(visits.patient_id)}})
+        MATCH (v:Visit {{id: toInteger(visits.visit_id)}})
+        MERGE (p)-[has:HAS]->(v)
+        """
+        _ = session.run(query, {})
