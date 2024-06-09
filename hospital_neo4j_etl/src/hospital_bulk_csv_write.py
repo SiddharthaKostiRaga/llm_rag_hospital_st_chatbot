@@ -170,3 +170,17 @@ def load_hospital_graph_from_csv() -> None:
             MERGE (p)-[treats:TREATS]->(v)
         """
         _ = session.run(query, {})
+
+    LOGGER.info("Loading 'COVERED_BY' relationships")
+    with driver.session(database="neo4j") as session:
+        query = f"""
+        LOAD CSV WITH HEADERS 
+        FROM '{VISITS_CSV_PATH}' AS visits
+        MATCH (v:Visit {{id: toInteger(visits.visit_id)}})
+        MATCH (p:Payer {{id: toInteger(visits.payer_id)}})
+        MERGE (v)-[covered_by:COVERED_BY]->(p)
+        ON CREATE SET
+            covered_by.service_date = visits.discharge_date,
+            covered_by.billing_amount = toFloat(visits.billing_amount)
+        """
+        _ = session.run(query, {})
