@@ -35,3 +35,21 @@ neo4j_vector_index = Neo4jVector.from_existing_graph(
     ],
     embedding_node_property="embedding",
 )
+
+review_template = """Your job is to use patient
+reviews to answer questions about their experience at a hospital. Use
+the following context to answer questions. Be as detailed as possible, but
+don't make up any information that's not from the context. If you don't know
+an answer, say you don't know.
+{context}
+"""
+
+#system prompt
+review_system_prompt = SystemMessagePromptTemplate(prompt=PromptTemplate(template=review_template, input_variables=["context"]))
+
+#human prompt
+review_human_prompt = HumanMessagePromptTemplate(prompt=PromptTemplate(template='{question}', input_variables = ["question"]))
+
+messages = [review_system_prompt, review_human_prompt]
+
+review_prompt = ChatPromptTemplate(messages=messages, input_variables=["context", "question"])
