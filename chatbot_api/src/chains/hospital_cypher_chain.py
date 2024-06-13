@@ -80,6 +80,13 @@ MATCH (r:Review)<-[:WRITES]-(v:Visit)-[:AT]->(h:Hospital)
 WHERE h.state_name = 'NC' and v.admission_type <> 'Emergency'
 RETURN count(*)
 
+# What is the average visit duration for emergency visits in North Carolina?
+MATCH (v:Visit)-[:AT]->(h:Hospital)
+WHERE h.state_name = 'NC' AND v.admission_type = 'Emergency'
+AND v.status = 'DISCHARGED'
+WITH v, duration.between(date(v.admission_date), date(v.discharge_date)).days AS visit_duration
+RETURN AVG(visit_duration) AS average_visit_duration
+
 String category values:
 Test results are one of: 'Inconclusive', 'Normal', 'Abnormal'
 Visit statuses are one of: 'OPEN', 'DISCHARGED'
@@ -101,6 +108,9 @@ follow as with statement (e.g. WITH v as visit, c.billing_amount as
 billing_amount)
 If you need to divide numbers, make sure to filter the denominator to be non
 zero.
+
+To calculate the duration between admission_date and discharge_date
+duration.between(date(v.admission_date), date(v.discharge_date)).days
 
 The question is:
 {question}
