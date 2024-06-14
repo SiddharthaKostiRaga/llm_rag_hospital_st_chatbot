@@ -61,10 +61,18 @@ tools = [
         name="Availability",
         func=get_most_available_hospital,
         description="""
-        Use when you need to find out which hospital has the shortest
-        wait time. This tool does not have any information about aggregate
+        Use to find shortest wait time of hospital. This tool does not have any information about aggregate
         or historical wait times. This tool returns a dictionary with the
         hospital name as the key and the wait time in minutes as the value.
         """,
     ),
 ]
+
+chat_model = ChatGroq(model=HOSPITAL_AGENT_MODEL, temperature=0)
+
+hospital_rag_agent = create_openai_functions_agent(llm = chat_model, prompt=hospital_agent_prompt, tools=tools)
+
+hospital_rag_agent_executor = AgentExecutor(agent=hospital_rag_agent,
+                                            tools=tools,
+                                            return_intermediate_steps=True,
+                                            verbose=True,)
